@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://camel.apache.org/schema/spring
+            http://camel.apache.org/schema/spring/camel-spring.xsd
+            http://camel.apache.org/schema/cxf
+            http://camel.apache.org/schema/cxf/camel-cxf.xsd">
+     <bean id="courseImpl" class="com.camel.service.CourseServiceImpl">
+     	<property name="dao">
+     		<ref bean="courseDAO"/>
+     	</property>
+     </bean>
+     <bean id="courseDAO" class="com.camel.dao.CourseDAO"/>
+	
+	<camel:camelContext xmlns="http://camel.apache.org/schema/spring">
+			<route id="wsServer">
+			<from uri="cxfrs:bean:courseService"/>
+			<bean ref="courseImpl"/>
+			<to uri="file:D://RESTOutputFolder?fileName=course.xml"/>
+		</route>
+		<route>
+			<from uri="direct:start"/>
+			<to uri="file:D://RESTOutputFolder?fileName=course.xml"/>
+		</route>	
+	</camel:camelContext>
+	
+		<cxf:rsServer id="courseService"
+			address="http://localhost:8888/" serviceClass="com.camel.resource.CourseResource"/>
+</beans>
